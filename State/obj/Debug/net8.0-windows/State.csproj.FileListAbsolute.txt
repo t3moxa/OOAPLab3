@@ -1,0 +1,17 @@
+D:\Work\GitHub\OOAPLab3\State\bin\Debug\net8.0-windows\State.exe
+D:\Work\GitHub\OOAPLab3\State\bin\Debug\net8.0-windows\State.deps.json
+D:\Work\GitHub\OOAPLab3\State\bin\Debug\net8.0-windows\State.runtimeconfig.json
+D:\Work\GitHub\OOAPLab3\State\bin\Debug\net8.0-windows\State.dll
+D:\Work\GitHub\OOAPLab3\State\bin\Debug\net8.0-windows\State.pdb
+D:\Work\GitHub\OOAPLab3\State\obj\Debug\net8.0-windows\State.MainForm.resources
+D:\Work\GitHub\OOAPLab3\State\obj\Debug\net8.0-windows\State.csproj.GenerateResource.cache
+D:\Work\GitHub\OOAPLab3\State\obj\Debug\net8.0-windows\State.GeneratedMSBuildEditorConfig.editorconfig
+D:\Work\GitHub\OOAPLab3\State\obj\Debug\net8.0-windows\State.AssemblyInfoInputs.cache
+D:\Work\GitHub\OOAPLab3\State\obj\Debug\net8.0-windows\State.AssemblyInfo.cs
+D:\Work\GitHub\OOAPLab3\State\obj\Debug\net8.0-windows\State.csproj.CoreCompileInputs.cache
+D:\Work\GitHub\OOAPLab3\State\obj\Debug\net8.0-windows\State.dll
+D:\Work\GitHub\OOAPLab3\State\obj\Debug\net8.0-windows\refint\State.dll
+D:\Work\GitHub\OOAPLab3\State\obj\Debug\net8.0-windows\State.pdb
+D:\Work\GitHub\OOAPLab3\State\obj\Debug\net8.0-windows\State.genruntimeconfig.cache
+D:\Work\GitHub\OOAPLab3\State\obj\Debug\net8.0-windows\ref\State.dll
+D:\Work\GitHub\OOAPLab3\State\obj\Debug\net8.0-windows\State.Properties.Resources.resources

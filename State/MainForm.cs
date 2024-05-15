@@ -5,7 +5,6 @@ namespace State
 {
     public partial class MainForm : Form
     {
-        List<Truck> _trucks = new List<Truck>();
         Truck _mainTruck;
         PictureBox _truckPictureBox;
         Graphics g;
@@ -42,6 +41,7 @@ namespace State
             InitializeDrawingTools();
             BackColor = Color.Black;
         }
+        #region Рисовашки
         public void InitializeDrawingTools()
         {
             _leftIndent = 200;
@@ -254,6 +254,28 @@ namespace State
             Station curStation = Station.GetStation(_stationDictionary[(PictureBox)sender]);
             UpdateStationGoodsData(curStation);
         }
+        public void UpdateStationGoodsData(Station curStation)
+        {
+            _stationName.Text = curStation.Id.ToString();
+            for (int i = 0; i < 5; i++)
+            {
+                _stationGoods[i].Text = curStation.CurrentGoods[(Goods)i].ToString();
+            }
+            if (curStation.Id == TruckInterface.GetPosition())
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    _truckGoods[i].Text = TruckInterface.GetCargo()[(Goods)i].ToString();
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    _truckGoods[i].Text = "-";
+                }
+            }
+        }
         public void SpawnTruck()
         {
             PictureBox truck = new PictureBox();
@@ -269,6 +291,9 @@ namespace State
             truck.Show();
             _truckPictureBox = truck;
         }
+        #endregion
+
+        #region Handle
         public void HandleButton_Click(object sender, EventArgs e)
         {
             TruckInterface.Handle(this);
@@ -385,45 +410,28 @@ namespace State
             _timeRemainingLabel.Show();
             _timeLabel.Show();
         }
-        public void UpdateStationGoodsData(Station curStation)
-        {
-            _stationName.Text = curStation.Id.ToString();
-            for (int i = 0; i < 5; i++)
-            {
-                _stationGoods[i].Text = curStation.CurrentGoods[(Goods)i].ToString();
-            }
-            if (curStation.Id == TruckInterface.GetPosition())
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    _truckGoods[i].Text = TruckInterface.GetCargo()[(Goods)i].ToString();
-                }
-            }
-            else
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    _truckGoods[i].Text = "-";
-                }
-            }
-        }
+        #endregion
+
         public void LoadButton_Click(object sender, EventArgs e)
         {
-            _timerTime = TruckInterface.StartLoading();
-            timer2.Start();
+            _timerTime = TruckInterface.Load();
+            timer_load.Start();
         }
         public void UnloadButton_Click(object sender, EventArgs e)
         {
-            _timerTime = TruckInterface.StartUnloading();
-            timer2.Start();
+            _timerTime = TruckInterface.Unload();
+            timer_unload.Start();
         }
         public void MoveButton_Click(object sender, EventArgs e)
         {
-            if (Station.TransitionMatrix[(int)TruckInterface.GetPosition(), Int32.Parse(_idleTextBox.Text)] == true)
+            if ((Int32.Parse(_idleTextBox.Text) >= 0) && (Int32.Parse(_idleTextBox.Text) <= _numOfStations))
             {
-                _moveDestinationId = Int32.Parse(_idleTextBox.Text);
-                _timerTime = _mainTruck.MoveTo(_moveDestinationId);
-                timer1.Start();
+                if (Station.TransitionMatrix[(int)TruckInterface.GetPosition(), Int32.Parse(_idleTextBox.Text)] == true)
+                {
+                    _moveDestinationId = Int32.Parse(_idleTextBox.Text);
+                    _timerTime = _mainTruck.MoveTo(_moveDestinationId);
+                    timer1.Start();
+                }
             }
         }
         private void timer1_Tick(object sender, EventArgs e)
@@ -438,14 +446,27 @@ namespace State
         public void MoveTruck()
         {
             _truckPictureBox.Location = new Point(Station.GetStation(_moveDestinationId).Location.x + _leftIndent - 5, Station.GetStation(_moveDestinationId).Location.y + _topIndent - 8);
+            TruckInterface.MoveTo(_moveDestinationId);
         }
 
-        private void timer2_Tick(object sender, EventArgs e)
+        private void timer_load_Tick(object sender, EventArgs e)
         {
-            _timerTime -= timer2.Interval / 100;
+            _timerTime -= timer_load.Interval / 100;
             if (_timerTime < 0)
             {
-                timer2.Stop();
+                timer_load.Stop();
+                TruckInterface.Load();
+                UpdateStationGoodsData(Station.GetStation((int)TruckInterface.GetPosition()));
+            }
+        }
+
+        private void timer_unload_Tick(object sender, EventArgs e)
+        {
+            _timerTime -= timer_unload.Interval / 100;
+            if (_timerTime < 0)
+            {
+                timer_unload.Stop();
+                TruckInterface.Unload();
                 UpdateStationGoodsData(Station.GetStation((int)TruckInterface.GetPosition()));
             }
         }

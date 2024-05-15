@@ -20,7 +20,7 @@ namespace State
     public static class TruckInterface
     {
         public static Truck CurrentState { get; set; }
-        public static List<Truck> states { get; set; } = new List<Truck>();
+        public static List<Truck> States { get; set; } = new List<Truck>();
         public static void Handle(MainForm form)
         {
             CurrentState.Handle(form);
@@ -33,13 +33,13 @@ namespace State
         {
             return CurrentState.GetPosition();
         }
-        public static double? StartUnloading()
+        public static double? Unload()
         {
-            return CurrentState.StartUnloading();
+            return CurrentState.Unload();
         }
-        public static double? StartLoading()
+        public static double? Load()
         {
-            return CurrentState.StartLoading();
+            return CurrentState.Load();
         }
         public static Dictionary<Goods, int> GetCargo()
         {
@@ -49,8 +49,7 @@ namespace State
     public abstract class Truck
     {
         protected static int positionId;
-        protected static Dictionary<Goods, int> Cargo  = new Dictionary<Goods, int>();
-
+        protected static Dictionary<Goods, int> Cargo  = new Dictionary<Goods, int>(); 
         public Dictionary<Goods, int> GetCargo()
         {
             return Cargo;
@@ -60,38 +59,37 @@ namespace State
             TruckIdle TI = new TruckIdle();
             positionId = 0;
             Cargo = GoodsHandler.RandomizeGoods(3);
-            TruckInterface.states.Add(TI);
+            TruckInterface.States.Add(TI);
             TruckMoving TM = new TruckMoving();
-            TruckInterface.states.Add(TM);
+            TruckInterface.States.Add(TM);
             TruckLoading TL = new TruckLoading();
-            TruckInterface.states.Add(TL);
+            TruckInterface.States.Add(TL);
             TruckUnloading TU = new TruckUnloading();
-            TruckInterface.states.Add(TU);
+            TruckInterface.States.Add(TU);
             TruckInterface.CurrentState = TI;
             return TI;
         }
         protected static void SetStateIdle()
         {
-            TruckInterface.CurrentState = TruckInterface.states.ElementAt(0);
+            TruckInterface.CurrentState = TruckInterface.States.ElementAt(0);
         }
         protected static void SetStateMoving()
         {
-            TruckInterface.CurrentState = TruckInterface.states.ElementAt(1);
-
+            TruckInterface.CurrentState = TruckInterface.States.ElementAt(1);
         }
         protected static void SetStateLoading()
         {
-            TruckInterface.CurrentState = TruckInterface.states.ElementAt(2);
+            TruckInterface.CurrentState = TruckInterface.States.ElementAt(2);
         }
         protected static void SetStateUnloading()
         {
-            TruckInterface.CurrentState = TruckInterface.states.ElementAt(3);
+            TruckInterface.CurrentState = TruckInterface.States.ElementAt(3);
         }
         public abstract void Handle(MainForm form);
         public abstract double? MoveTo(int destinationId);
         public abstract int? GetPosition();
-        public abstract double? StartUnloading();
-        public abstract double? StartLoading();
+        public abstract double? Load();
+        public abstract double? Unload();
     }
     public class TruckMoving : Truck
     {
@@ -101,17 +99,19 @@ namespace State
         }
         public override double? MoveTo(int destinationId)
         {
+            positionId = destinationId;
+            SetStateIdle();
             return null;
         }
         public override int? GetPosition()
         {
             return null;
         }
-        public override double? StartLoading()
+        public override double? Load()
         {
             return null;
         }
-        public override double? StartUnloading()
+        public override double? Unload()
         {
             return null;
         }
@@ -130,11 +130,17 @@ namespace State
         {
             return positionId;
         }
-        public override double? StartLoading()
+        public override double? Load()
         {
+            for (int i = 0; i < 5; i++)
+            {
+                Cargo[(Goods)i] += Station.GetStation(positionId).CurrentGoods[(Goods)i];
+            }
+            Station.GetStation(positionId).CurrentGoods = GoodsHandler.InitializeGoods();
+            SetStateIdle();
             return null;
         }
-        public override double? StartUnloading()
+        public override double? Unload()
         {
             return null;
         }
@@ -153,12 +159,18 @@ namespace State
         {
             return positionId;
         }
-        public override double? StartLoading()
+        public override double? Load()
         {
             return null;
         }
-        public override double? StartUnloading()
+        public override double? Unload()
         {
+            foreach (KeyValuePair<Goods, int> entry in Cargo)
+            {
+                Station.GetStation(positionId).CurrentGoods[entry.Key] += entry.Value;
+            }
+            Cargo = GoodsHandler.InitializeGoods();
+            SetStateIdle();
             return null;
         }
     }
@@ -172,8 +184,6 @@ namespace State
         {
             SetStateMoving();
             double arrivalTime = Math.Sqrt(Math.Pow((Station.GetStation(positionId).Location.x - Station.GetStation(positionId).Location.x), 2) + Math.Pow((Station.GetStation(destinationId).Location.y - Station.Stations.ElementAt(positionId).Location.y), 2))/10;
-            positionId = destinationId;
-            Run(arrivalTime);
             return arrivalTime;
         }
         private async void Run(double time)
@@ -186,30 +196,24 @@ namespace State
         {
             return positionId;
         }
-        public override double? StartLoading()
+        public override double? Load()
         {
             SetStateLoading();
             double loadingTime = 0;
-            for (int i = 0; i < 5; i++)
+            foreach (KeyValuePair<Goods, int> entry in Station.GetStation(positionId).CurrentGoods)
             {
-                loadingTime += Cargo[(Goods)i];
-                Cargo[(Goods)i] += Station.GetStation(positionId).CurrentGoods[(Goods)i];
+                loadingTime += entry.Value * 2;
             }
-            Station.GetStation(positionId).CurrentGoods = GoodsHandler.InitializeGoods();
-            Run(loadingTime);
             return loadingTime;
         }
-        public override double? StartUnloading()
+        public override double? Unload()
         {
             SetStateUnloading();
             double unloadingTime = 0;
             foreach (KeyValuePair<Goods, int> entry in Cargo)
             {
                 unloadingTime += entry.Value * 2;
-                Station.GetStation(positionId).CurrentGoods[entry.Key] += entry.Value;
             }
-            Cargo = GoodsHandler.InitializeGoods();
-            Run(unloadingTime);
             return unloadingTime;
         }
     }

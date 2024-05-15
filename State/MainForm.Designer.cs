@@ -31,7 +31,8 @@
             components = new System.ComponentModel.Container();
             button1 = new Button();
             timer1 = new System.Windows.Forms.Timer(components);
-            timer2 = new System.Windows.Forms.Timer(components);
+            timer_load = new System.Windows.Forms.Timer(components);
+            timer_unload = new System.Windows.Forms.Timer(components);
             SuspendLayout();
             // 
             // button1
@@ -51,10 +52,15 @@
             timer1.Interval = 200;
             timer1.Tick += timer1_Tick;
             // 
-            // timer2
+            // timer_load
             // 
-            timer2.Interval = 200;
-            timer2.Tick += timer2_Tick;
+            timer_load.Interval = 200;
+            timer_load.Tick += timer_load_Tick;
+            // 
+            // timer_unload
+            // 
+            timer_unload.Interval = 200;
+            timer_unload.Tick += timer_unload_Tick;
             // 
             // MainForm
             // 
@@ -77,6 +83,7 @@
 
         private Button button1;
         private System.Windows.Forms.Timer timer1;
-        private System.Windows.Forms.Timer timer2;
+        private System.Windows.Forms.Timer timer_load;
+        private System.Windows.Forms.Timer timer_unload;
     }
 }
